@@ -1,6 +1,6 @@
 import fileio
 import regex
-import Model2
+from itertools import product, repeat
 
 def Check(substr1, substr2):
     if regex.match(substr1, substr2) != None:
@@ -17,6 +17,19 @@ def DB(dataNum):
         neg=fileio.readFile("negative2.txt")
     return [pos, neg]
 
+def GenerateM(Seqs):
+    M = [list(repeat(0.0, 6)) for i in range(4)]
+    for k in range(len(Seqs)):
+        for j in range(6):
+            if Seqs[k][j]=="A":
+                M[0][j]+=1
+            if Seqs[k][j]=="G":
+                M[1][j]+=1
+            if Seqs[k][j]=="C":
+                M[2][j]+=1
+            if Seqs[k][j]=="T":
+                M[3][j]+=1
+    return M
 
 def LOOCV1(func,dataNum):
     #Create result counts
@@ -77,7 +90,7 @@ def LOOCV2(func,dataNum):
     neg=data[1]
     total=pos+neg
 
-    M=Model2.GenerateM(pos)
+    M=GenerateM(pos)
 
     #Run function on everything but Xi to get subsequence and cross check it against the dataset
     for i in range(len(pos)):
@@ -133,4 +146,3 @@ def NumError(substr, pos, neg):
             FalsePos+=1
 
     return [FalsePos, FalseNeg]
-    

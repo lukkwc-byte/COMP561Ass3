@@ -2,6 +2,7 @@ import fileio
 import Evaluate
 from itertools import product, repeat
 
+
 def DBSelector(num):
     if num==1:
         return ["positive1.txt", "negative1.txt"]
@@ -14,19 +15,6 @@ def Permute():
     return product(bp, repeat=6)
 
 #Generate PWM
-def GenerateM(Seqs):
-    M = [list(repeat(0.0, 6)) for i in range(4)]
-    for k in range(len(Seqs)):
-        for j in range(6):
-            if Seqs[k][j]=="A":
-                M[0][j]+=1
-            if Seqs[k][j]=="G":
-                M[1][j]+=1
-            if Seqs[k][j]=="C":
-                M[2][j]+=1
-            if Seqs[k][j]=="T":
-                M[3][j]+=1
-    return M
                    
 def BPtoI(BP):
     if BP=="A": return 0
@@ -80,4 +68,4 @@ def train(index, pos, neg, M):
             fNeg=fList[1]
   return [bestSeq, fPos, fNeg]
 
-print(Evaluate.LOOCV2(train, 1))
+Evaluate.LOOCV2(train, 1)
