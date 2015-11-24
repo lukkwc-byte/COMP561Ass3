@@ -42,7 +42,7 @@ def FindMotif(b, nb, total):
         a=Matchs(bound, t)
         if a > 500:
             b=Matchs(unbound,t)
-            ratio=float(a)/float(b) if float(b) > 0 else 0 
+            ratio = a/b if b > 0 else 0 
             if ratio == 0:
                 print(str(t))
             if ratio > bestRatio:

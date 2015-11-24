@@ -2,6 +2,8 @@ import fileio
 import regex
 from itertools import product, repeat
 
+pos, neg = "",""
+
 def Check(substr1, substr2):
     if regex.match(substr1, substr2) != None:
         return 1
@@ -9,6 +11,8 @@ def Check(substr1, substr2):
         return 0
 
 def DB(dataNum):
+    global pos
+    global neg
     if dataNum==1:
         pos=fileio.readFile("positive1.txt")
         neg=fileio.readFile("negative1.txt")
@@ -30,6 +34,32 @@ def GenerateM(Seqs):
             if Seqs[k][j]=="T":
                 M[3][j]+=1
     return M
+
+def SS(seq):
+#Create result counts
+  TruePos = 0
+  TrueNeg = 0
+  FalseNeg = 0
+  FalsePos = 0
+
+  #Run function on everything but Xi to get subsequence and cross check it against the dataset
+  for j in range(len(pos)):
+    if Check(substr, pos[j])==1:
+      TruePos+=1
+    else:
+      FalseNeg+=1
+  for j in range(len(neg)):
+    if Check(substr, neg[j])==1:
+      FalsePos+=1
+    else:
+      TrueNeg+=1
+
+  #Calculate sensitivity and specificity
+  Sens=TruePos/(TruePos+FalseNeg)
+  Spec=TrueNeg/(TrueNeg+FalsePos)
+
+  return [Sens, Spec]
+ 
 
 def LOOCV1(func,dataNum):
     #Create result counts
@@ -94,7 +124,7 @@ def LOOCV2(func,dataNum):
 
     #Run function on everything but Xi to get subsequence and cross check it against the dataset
     for i in range(len(pos)):
-        retList=func(i, pos, neg, M)
+        retList=func(i,neg, pos, M)
         substr=retList[0]
         fPos=retList[1]
         FalsePos+=fPos
@@ -107,7 +137,7 @@ def LOOCV2(func,dataNum):
             if Check(substr, neg[j])==0:
                 TrueNeg+=1
                 
-    retList=func(len(pos), pos, neg, M)
+    retList=func(len(pos), neg, pos, M)
     substr=retList[0]
     fPos=retList[1]
     fNeg=retList[2]
@@ -128,13 +158,12 @@ def LOOCV2(func,dataNum):
     return [Sens, Spec]
 
 
-def NumError(substr, pos, neg):
+def NumError(substr):
     #Create result counts
     FalseNeg=0.0
     FalsePos=0.0
 
     #load correct dataset
-    data=DB(dataNum)
     total=pos+neg
 
     #Calculate false positives and false negatives
