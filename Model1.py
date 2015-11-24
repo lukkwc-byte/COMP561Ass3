@@ -24,7 +24,6 @@ def CalcFreq(length, seq):
 
 def train(index,pos,neg):
     seq = ""
-    if not index < len(pos): return 0
     pos = pos[:index]+pos[index+1:]
     l = CalcFreq(6,pos)
     for d in l:
@@ -34,4 +33,4 @@ def train(index,pos,neg):
         seq += "[{}]".format("|".join([x[0] for x in j[0:k]]))
     return seq
 
-print(Evaluate.LOOCV(train, 1))
+print(Evaluate.LOOCV1(train, 1))
