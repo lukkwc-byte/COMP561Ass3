@@ -1,5 +1,6 @@
 import fileio
 import regex
+import Model2
 
 def Check(substr1, substr2):
     if regex.match(substr1, substr2) != None:
@@ -76,9 +77,11 @@ def LOOCV2(func,dataNum):
     neg=data[1]
     total=pos+neg
 
+    M=Model2.GenerateM(pos)
+
     #Run function on everything but Xi to get subsequence and cross check it against the dataset
     for i in range(len(pos)):
-        retList=func(i, pos, neg)
+        retList=func(i, pos, neg, M)
         substr=retList[0]
         fPos=retList[1]
         FalsePos+=fPos
@@ -91,7 +94,7 @@ def LOOCV2(func,dataNum):
             if Check(substr, neg[j])==0:
                 TrueNeg+=1
                 
-    retList=func(len(pos), pos, neg)
+    retList=func(len(pos), pos, neg, M)
     substr=retList[0]
     fPos=retList[1]
     fNeg=retList[2]
