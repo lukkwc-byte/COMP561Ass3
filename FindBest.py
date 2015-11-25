@@ -77,10 +77,6 @@ def AnyBPHelper(ret):
         copy3[i]=copy3[i]+"T"
     return ret+copy1+copy2+copy3
 
-def Bin(s, t, p):
-    
-
-
 def FindMotif(b, nb):
     ml=Permute()
     bound=fileio.readFile(b)
