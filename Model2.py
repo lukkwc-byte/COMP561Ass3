@@ -43,6 +43,15 @@ def prob(seq,M):
         p *= sum(M[int(x)][i]/len(pos) for x in str(BPtoI(seq[i])))
     return p
 
+def pls(M, index):
+  print(index, len(pos))
+  x = pos[index]
+  retseqs = []
+  seqs = Permute()
+  for i in range(6):
+    M[BPtoI(x[i])][i] -= 1
+  return seqs
+
 def haskellMasterRace(M, index, t):
   print(index, len(pos))
   x = pos[index]
@@ -104,14 +113,13 @@ def ROC(index, pos1, neg1, M):
   tot = tot[:index]+tot[index+1:]
   sensL, specL = [],[]
   t0 = time.time()
+  seqList = pls(M, index)
   for i in range(20):
     t1 = t0
     print(t1-t0)
     t0 = time.time()
     T=0.00001*i
-    seqList=haskellMasterRace(M, index, T)
-    slist = [Evaluate.SS(x) for x in seqList]
-    print(slist)
+    slist = [Evaluate.SS("".join(x)) for x in seqList]
     top = sorted(slist, key = lambda x: x[0]*x[1])[0]
     sensL.append(top[0])
     specL.append(top[1])
