@@ -23,12 +23,14 @@ def CalFreq(fil):           #loop through and count base pairs and divide by tot
     freq['T']=freq['T']/bp
     return freq
 
-def Permute():          #generate 2 lists. One for regex with all combos with bp and another with special characters representing the multi
-    bp=["A","G","C","T"]
+#Generate a list of possible sequences with special characters for double bp
+def Permute():          
+    bp=["A","G","C","T", "l", "m", "n", "o", "p", "q", "r"]
     ml = product(bp, repeat=6)
     return ml
 
-def CreateSeqDict():          #generate 2 lists. One for regex with all combos with bp and another with special characters representing the multi
+#Create an empty dictionary of all possible 6bp
+def CreateSeqDict():          
     bp=["A","G","C","T"]
     ml = product(bp, repeat=6)
     SeqDict={}
@@ -37,11 +39,62 @@ def CreateSeqDict():          #generate 2 lists. One for regex with all combos w
         SeqDict[t]=0
     return SeqDict
 
+#Sliding window dictionary
 def UpdateDict(SeqDict, text):
     for i in 
     for i in range(len(text)-5):
         SeqDict[text[i:i+6]]+=1
     return SeqDict
+
+#returns the possible nucleotides in a list given the special character
+def DoubleBP(char):
+    if char=="l": return ["A","C"]
+    if char=="m": return ["A","G"]
+    if char=="n": return ["A","T"]
+    if char=="o": return ["C","G"]
+    if char=="p": return ["C","T"]
+    if char=="q": return ["G","T"]
+    if char=="r": return ["A","C","G","T"]
+
+#Returns a list of the possible sequences that can bind this consensus sequence
+def GiveSeqs(substr):
+    baseSeq=""
+    ret=[baseSeq]
+    for i in range(len(substr)):
+        if substr[i]=="l" or substr[i]=="m" or substr[i]=="n" or substr[i]=="o" or substr[i]== "p" or substr[i]== "q":
+            ret=GiveSeqsHelper(substr[i],ret)
+        elif substr[i]=="r":
+            ret=AnyBPHelper(ret)
+        else:
+            for j in range(len(ret)):
+                ret[j]=ret[j]+substr[i]
+    return ret
+
+#Take current list of possible sequences and double number of possible sequences by adding possible bp
+def GiveSeqsHelper(char,ret):
+    copy=list(ret)
+    alt=DoubleBP(char)
+    for i in range(len(ret)):
+        ret[i]=ret[i]+alt[0]
+    for i in range(len(ret)):
+        copy[i]=copy[i]+alt[1]
+    return copy+ret
+
+#In case of any bp double possible seqs by 4
+def AnyBPHelper(ret):
+    copy1=list(ret)
+    copy2=list(ret)
+    copy3=list(ret)
+    for i in range(len(ret)):
+        ret[i]=ret[i]+"A"
+    for i in range(len(ret)):
+        copy1[i]=copy1[i]+"G"
+    for i in range(len(ret)):
+        copy2[i]=copy2[i]+"C"
+    for i in range(len(ret)):
+        copy3[i]=copy3[i]+"T"
+    return ret+copy1+copy2+copy3
+
 
 def FindMotif(b, nb, total):
     ml=Permute()
@@ -53,15 +106,17 @@ def FindMotif(b, nb, total):
     bestSeq=""
     bestRatio=0
     for s in ml:
-        t="".join(s)
-        a=boundDict[s]
-        b=unboundDict[s]
-        ratio = a/b if b > 0 else 0
-        if ratio == 0:
-                print(str(t))
-        if ratio > bestRatio:
-            bestRatio=ratio
-            bestSeq=s
+        conSeq="".join(s)
+        possibleSeqs=GiveSeqs(conSeq)
+        for seq in possibleSeqs:
+            a=boundDict[seq]
+            b=unboundDict[seq]
+            ratio = a/b if b > 0 else 0
+            if ratio == 0:
+                    print(str(t))
+            if ratio > bestRatio:
+                bestRatio=ratio
+                bestSeq=s
     return bestSeq    
 
 print(FindMotif("b.fa", "n.fa", "total.fa"))
