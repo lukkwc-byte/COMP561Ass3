@@ -35,7 +35,7 @@ def GenerateM(Seqs):
                 M[3][j]+=1
     return M
 
-def SS(seq):
+def SS(substr):
 #Create result counts
   TruePos = 0
   TrueNeg = 0

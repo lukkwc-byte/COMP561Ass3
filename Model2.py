@@ -1,5 +1,6 @@
 import fileio
 import Evaluate
+import time
 from itertools import product, repeat
 
 pos=""
@@ -43,6 +44,7 @@ def prob(seq,M):
     return p
 
 def haskellMasterRace(M, index, t):
+  print(index, len(pos))
   x = pos[index]
   retseqs = []
   seqs = Permute()
@@ -83,31 +85,38 @@ def train(index, pos1, neg1, M):
       T=0.00001*i
       print(T)
       seqList=haskellMasterRace(M, index, T)
-      for i in range(len(seqList)):
-          evalList=Evaluate.NumError(seqList[i])
+      for j in range(len(seqList)):
+          evalList=Evaluate.NumError(j)
           E=evalList[0]+evalList[1]
           if E < bestE:
             bestE=E
-            bestSeq=seqList[i]
+            bestSeq=j
             fPos=evalList[0]
             fNeg=evalList[1]
   return [bestSeq, fPos, fNeg]
 
-def ROC(index, M):
+def ROC(index, pos1, neg1, M):
+  global pos
+  global neg
+  pos = pos1
+  neg = neg1
   tot = pos+neg
   tot = tot[:index]+tot[index+1:]
-  T=0
-  bestT=0
-  bestE=99999999999
-  fPos=0
-  fNeg=0
-  bestSeq=""
+  sensL, specL = [],[]
+  t0 = time.time()
   for i in range(20):
-      T=0.00001*i
-      seqList=haskellMasterRace(M, index, T)
-      for i in range(seqList):
-          evalList=Evaluate.SS(seqList[i])
-  
+    t1 = t0
+    print(t1-t0)
+    t0 = time.time()
+    T=0.00001*i
+    seqList=haskellMasterRace(M, index, T)
+    slist = [Evaluate.SS(x) for x in seqList]
+    print(slist)
+    top = sorted(slist, key = lambda x: x[0]*x[1])[0]
+    sensL.append(top[0])
+    specL.append(top[1])
+  print("sensL: {}".format(sensL))
+  print("specL: {}".format(specL))
   return [sensL, specL]
 
-Evaluate.LOOCV2(train, 1)
+Evaluate.LOOCV2(ROC, 1)
