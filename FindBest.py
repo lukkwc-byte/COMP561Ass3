@@ -2,7 +2,6 @@ import fileio
 import regex
 import math
 import time
-import SciPy
 from itertools import product
 
 #Generate a list of possible sequences with special characters for double bp
@@ -87,21 +86,22 @@ def FindMotif(b, nb):
     boundDict=UpdateDict(boundDict, bound)
     bestSeq=""
     bestRatio=0
+    bestRatios=[0,0,0,0,0]
     count=0
     for s in ml:
         count+=1
         conSeq="".join(s)
         possibleSeqs=GiveSeqs(conSeq)
+        a=0
+        b=0
         for seq in possibleSeqs:
-            a=boundDict[seq]
-            b=unboundDict[seq]
-            ratio = a/b
-            if ratio == 0:
-                    print(str(t))
-            if ratio > bestRatio:
-                bestRatio=ratio
-                bestSeq=conSeq
-    return bestSeq    
+            a+=boundDict[seq]
+            b+=unboundDict[seq]
+        ratio = a/b
+        if ratio > bestRatio:
+            bestRatio=ratio
+            bestSeq=conSeq
+    return bestSeq
 
-print(FindMotif("b.fa", "n.fa"))
+print(FindMotif("b0.fa", "n0.fa"))
 
