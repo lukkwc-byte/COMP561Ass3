@@ -24,30 +24,44 @@ def CalFreq(fil):           #loop through and count base pairs and divide by tot
     return freq
 
 def Permute():          #generate 2 lists. One for regex with all combos with bp and another with special characters representing the multi
-    bp=["A","G","C","T","[A|C]","[A|G]","[A|T]","[C|G]","[C|T]","[G|T]","[A|G|C|T]"]
+    bp=["A","G","C","T"]
     ml = product(bp, repeat=6)
     return ml
 
-def Matchs(text, substr):           #count number of matches
-    return len(regex.findall(substr, text, overlapped=True))
+def CreateSeqDict():          #generate 2 lists. One for regex with all combos with bp and another with special characters representing the multi
+    bp=["A","G","C","T"]
+    ml = product(bp, repeat=6)
+    SeqDict={}
+    for s in ml:
+        t="".join(s)
+        SeqDict[t]=0
+    return SeqDict
+
+def UpdateDict(SeqDict, text):
+    for i in 
+    for i in range(len(text)-5):
+        SeqDict[text[i:i+6]]+=1
+    return SeqDict
 
 def FindMotif(b, nb, total):
     ml=Permute()
-    bound=fileio.readFileNS(b)
-    unbound=fileio.readFileNS(nb)
+    bound=fileio.readFile(b)
+    unbound=fileio.readFile(nb)
+    emptyDict=CreateSeqDict()
+    unboundDict=UpdateDict(emptyDict, unbound)
+    boundDict=UpdateDict(emptyDict, bound)
     bestSeq=""
     bestRatio=0
     for s in ml:
-        t = "".join(s)
-        a=Matchs(bound, t)
-        if a > 500:
-            b=Matchs(unbound,t)
-            ratio = a/b if b > 0 else 0 
-            if ratio == 0:
+        t="".join(s)
+        a=boundDict[s]
+        b=unboundDict[s]
+        ratio = a/b if b > 0 else 0
+        if ratio == 0:
                 print(str(t))
-            if ratio > bestRatio:
-                bestRatio=ratio
-                bestSeq=t
+        if ratio > bestRatio:
+            bestRatio=ratio
+            bestSeq=s
     return bestSeq    
 
 print(FindMotif("b.fa", "n.fa", "total.fa"))
