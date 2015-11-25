@@ -2,26 +2,8 @@ import fileio
 import regex
 import math
 import time
+import SciPy
 from itertools import product
-
-def CalFreq(fil):           #loop through and count base pairs and divide by total with special characters representing multiple bases
-    freq={}
-    freq['A']=0
-    freq['G']=0
-    freq['C']=0
-    freq['T']=0
-    totalbp=0
-    lines=fileio.readFile(fil)
-    for i in range(len(lines)):
-        for j in range(len(lines[i])):
-            freq[lines[i][j]]+=1
-            totalbp+=1
-    bp=float(totalbp)
-    freq['A']=freq['A']/bp
-    freq['G']=freq['G']/bp
-    freq['C']=freq['C']/bp
-    freq['T']=freq['T']/bp
-    return freq
 
 #Generate a list of possible sequences with special characters for double bp
 def Permute():          
@@ -40,10 +22,10 @@ def CreateSeqDict():
     return SeqDict
 
 #Sliding window dictionary
-def UpdateDict(SeqDict, text):
-    for i in 
-    for i in range(len(text)-5):
-        SeqDict[text[i:i+6]]+=1
+def UpdateDict(SeqDict, text): 
+    for line in text:
+        for i in range(len(line)-5):
+            SeqDict[line[i:i+6]]+=1
     return SeqDict
 
 #returns the possible nucleotides in a list given the special character
@@ -95,29 +77,35 @@ def AnyBPHelper(ret):
         copy3[i]=copy3[i]+"T"
     return ret+copy1+copy2+copy3
 
+def Bin(s, t, p):
+    
 
-def FindMotif(b, nb, total):
+
+def FindMotif(b, nb):
     ml=Permute()
     bound=fileio.readFile(b)
     unbound=fileio.readFile(nb)
-    emptyDict=CreateSeqDict()
-    unboundDict=UpdateDict(emptyDict, unbound)
-    boundDict=UpdateDict(emptyDict, bound)
+    boundDict=CreateSeqDict()
+    unboundDict=boundDict.copy()
+    unboundDict=UpdateDict(unboundDict, unbound)
+    boundDict=UpdateDict(boundDict, bound)
     bestSeq=""
     bestRatio=0
+    count=0
     for s in ml:
+        count+=1
         conSeq="".join(s)
         possibleSeqs=GiveSeqs(conSeq)
         for seq in possibleSeqs:
             a=boundDict[seq]
             b=unboundDict[seq]
-            ratio = a/b if b > 0 else 0
+            ratio = a/b
             if ratio == 0:
                     print(str(t))
             if ratio > bestRatio:
                 bestRatio=ratio
-                bestSeq=s
+                bestSeq=conSeq
     return bestSeq    
 
-print(FindMotif("b.fa", "n.fa", "total.fa"))
+print(FindMotif("b.fa", "n.fa"))
 
