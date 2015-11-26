@@ -1,6 +1,3 @@
-import fileio
-import Evaluate
-
 def CalFreqHelper(lis, index):           #loop through and count base pairs and divide by total with special characters representing multiple bases
     freq={}
     freq['A']=0
@@ -32,5 +29,3 @@ def train(index,pos,neg):
         while sum([x[1] for x in j[0:k]]) < 0.9: k+=1
         seq += "[{}]".format("|".join([x[0] for x in j[0:k]]))
     return seq
-
-print(Evaluate.LOOCV1(train, 1))
