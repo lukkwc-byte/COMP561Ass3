@@ -2,12 +2,14 @@ import fileio
 import Model1
 import Model2
 import Evaluate
+import time
 from itertools import product, repeat
 
 #global variables
 pos = ""
 neg = ""
 M = []
+tc , lp = 0, 0
 
 def DB(dataNum):
     global pos, neg, tc, lp
@@ -17,6 +19,8 @@ def DB(dataNum):
     else:
         pos=fileio.readFile("positive2.txt")
         neg=fileio.readFile("negative2.txt")
+    lp = len(pos)
+    tc = lp**6
 
 def Mod1(func,dataNum):
    
@@ -38,9 +42,9 @@ def Mod1(func,dataNum):
     Cseq=func(len(pos), pos, neg)
     for i in range(len(neg)):
         if Evaluate.Bind(Cseq, neg[i])==0:
-          TNeg+=1
+          TNeg[1]+=1
         else:
-          FNeg+=1
+          FNeg[3]+=2
     
     #Calculate sensitivity and specificity
     Sens=TPos/(TPos+FNeg)
@@ -94,7 +98,7 @@ def generateD():
   seqs = Permute()
   for cand in seqs:
     seq = "".join(cand)
-    retseqs.append(seq, prob(seq))
+    retseqs.append([seq, prob(seq)])
   return sorted(retseqs, reverse=True, key = lambda x: x[1])
 
 def Mod2(func,dataNum):
@@ -114,7 +118,10 @@ def Mod2(func,dataNum):
           M[BPtoI(pos[i][j])][j] -= 1
             
         #M --> prob
+        t0 = time.time()
         D = generateD() 
+        t1 = time.time()
+        print("Generating D took {} seconds.".format(t1-t0))
         substr = func(D, pos, neg, i)
         
         #Generates reults
@@ -146,8 +153,7 @@ def Mod2(func,dataNum):
 
     return [Sens, Spec]
 
-print(Mod1(Model1.train, 1))
-
+print(Mod2(Model2.train,1))
 """
 def SS(substr):
 #Create result counts

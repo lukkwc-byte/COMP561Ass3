@@ -1,4 +1,5 @@
 import Evaluate
+import regex
 import time
 from itertools import product, repeat
 
@@ -39,23 +40,23 @@ def prob(seq,M):
         p *= sum(M[int(x)][i] for x in str(BPtoI(seq[i])))
     return p/tc
 
-#returns the base pair equivalent of special characters
 def SpecCharToBPChar(char):
-  if char==l: return "[A|C]"
-  if char==m: return "[A|G]"
-  if char==n: return "[A|T]"
-  if char==o: return "[C|G]"
-  if char==p: return "[C|T]"
-  if char==q: return "[G|T]"
-  if char==r: return "[A|G|C|T]"
+  if char=="l": return "[A|C]"
+  if char=="m": return "[A|G]"
+  if char=="n": return "[A|T]"
+  if char=="o": return "[C|G]"
+  if char=="p": return "[C|T]"
+  if char=="q": return "[G|T]"
+  if char=="r": return "[A|G|C|T]"
 
 #takes consensus sequences and makes them regex'able
 def Transmute(Cseq):
-  newCSeq=""
-  for i in range(len(Cseq)):
-    if Cseq[i]=="l" or Cseq[i]=="m" or Cseq[i]=="n" or Cseq[i]=="o" or Cseq[i]=="p" or Cseq[i]=="q" or Cseq[i]=="r":
-          newCSeq+=SpecCharToBP(Cseq[i])
-    else: newCSeq+=Cseq[i]
+    newCSeq=""
+    for i in range(len(Cseq)):
+        if Cseq[i]=="l" or Cseq[i]=="m" or Cseq[i]=="n" or Cseq[i]=="o" or Cseq[i]=="p" or Cseq[i]=="q" or Cseq[i]=="r":
+            newCSeq+=SpecCharToBPChar(Cseq[i])
+        else:
+            newCSeq+=Cseq[i]
     return newCSeq
 
 #training function
@@ -67,20 +68,24 @@ def train(D, Ppos, Pneg, index):
   neg = Pneg
   tc= len(pos)**6
   lp = len(pos)
-  
+  false=0
   #local variables
   bestE=99999999999
   
   #loops through t's and generates a 
-  for i in range(100):
-      T=0.000002*i
+  for i in range(10):
+      T=0.00002*i
+      print(T)
       for Cseq, prob in D:
           newCseq=Transmute(Cseq)
           if prob < T: break
-          E=Evaluate.NumFalse(index, newCseq, pos, neg)
-          if E < bestE:
-              bestE=E
-              bestSeq=Cseq
+          for j in range(lp):
+            if j != index and not regex.match(newCseq, pos[j]): false+=1
+          for j in range(len(neg)):
+            if j != index and regex.match(newCseq, neg[j]): false+=1
+          if false < bestE:
+              bestE=false
+              bestSeq=newCseq
   return bestSeq 
 
 """
