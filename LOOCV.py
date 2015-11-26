@@ -38,9 +38,9 @@ def Mod1(func,dataNum):
     Cseq=func(len(pos), pos, neg)
     for i in range(len(neg)):
         if Evaluate.Bind(Cseq, neg[i])==0:
-          TNeg[1]+=1
+          TNeg+=1
         else:
-          FNeg[3]+=2
+          FNeg+=1
     
     #Calculate sensitivity and specificity
     Sens=TPos/(TPos+FNeg)
@@ -145,7 +145,9 @@ def Mod2(func,dataNum):
     Spec=TrueNeg/(TrueNeg+FalsePos)
 
     return [Sens, Spec]
-  
+
+print(Mod1(Model1.train, 1))
+
 """
 def SS(substr):
 #Create result counts
