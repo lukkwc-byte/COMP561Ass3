@@ -1,8 +1,9 @@
 import fileio
 import regex
 import math
-import time
+import timeit
 from itertools import product
+from scipy.stats import binom
 
 #Generate a list of possible sequences with special characters for double bp
 def Permute():          
@@ -11,7 +12,7 @@ def Permute():
     return ml
 
 #Create an empty dictionary of all possible 6bp
-def CreateSeqDict():          
+def CreateSeqDict():           
     bp=["A","G","C","T"]
     ml = product(bp, repeat=6)
     SeqDict={}
@@ -76,31 +77,57 @@ def AnyBPHelper(ret):
         copy3[i]=copy3[i]+"T"
     return ret+copy1+copy2+copy3
 
+def prob(i, D):
+  p = 1
+  for char in i:
+    p *= D[char]
+  return p
+
+def allelefreqs(bound,unbound):
+    freqd = {"A":0,"C":0,"T":0,"G":0,"l":0,"m":0,"n":0,"o":0,"p":0,"q":0,"r":0}
+    for i in bound + unbound:
+      freqd[i] += 1
+    for i in 'lmnopqr':
+      freqd[i] = sum(freqd[x] for x in DoubleBP(i))
+    
+    for i in "ACTGlmnopqr":
+      freqd[i] = freqd[i]/len(bound+unbound)
+    return freqd
+
 def FindMotif(b, nb):
     ml=Permute()
-    bound=fileio.readFile(b)
-    unbound=fileio.readFile(nb)
+    bound=fileio.readFile(b)[0]
+    unbound=fileio.readFile(nb)[0]
+    trials=len(bound)+len(unbound)
+    aD=allelefreqs(bound,unbound)
     boundDict=CreateSeqDict()
-    unboundDict=boundDict.copy()
-    unboundDict=UpdateDict(unboundDict, unbound)
-    boundDict=UpdateDict(boundDict, bound)
+    boundDict=UpdateDict(boundDict, fileio.readFile(b))
     bestSeq=""
-    bestRatio=0
-    bestRatios=[0,0,0,0,0]
+    bestP=1
     count=0
+    print(aD)
     for s in ml:
-        count+=1
+        start=timeit.default_timer()
         conSeq="".join(s)
         possibleSeqs=GiveSeqs(conSeq)
-        a=0
-        b=0
+        t=0
         for seq in possibleSeqs:
-            a+=boundDict[seq]
-            b+=unboundDict[seq]
-        ratio = a/b
-        if ratio > bestRatio:
-            bestRatio=ratio
-            bestSeq=conSeq
+            t+=boundDict[seq]
+        if t == 5743:
+            q=prob(conSeq, aD)
+            p=binom.logpmf(t, trials, q, loc=trials*q)
+            if p < bestP:
+                bestSeq=conSeq
+                bestP=p
+        if count==1000000:
+            print("""
+────██──────▀▀▀██
+──▄▀█▄▄▄─────▄▀█▄▄▄
+▄▀──█▄▄──────█─█▄▄
+─▄▄▄▀──▀▄───▄▄▄▀──▀▄
+─▀───────▀▀─▀───────▀▀""")
+            count=0
+        count+=1
     return bestSeq
 
 print(FindMotif("b0.fa", "n0.fa"))
