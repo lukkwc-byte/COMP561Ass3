@@ -1,8 +1,6 @@
 import fileio
 import Model1
-import Model2
 import regex
-import Evaluate
 from random import randint
 import time
 from itertools import product, repeat
@@ -55,7 +53,6 @@ def Mod1(func,dataNum):
     #Calculate sensitivity and specificity
     Sens=TPos/(TPos+FNeg)
     Spec=TNeg/(TNeg+FPos)
-
     return Sens, Spec
 
 def GenerateM(Seqs):
@@ -218,9 +215,9 @@ def ROC(func,dataNum):
     
 
   
-#print(Mod1(Model1.train,1))
-#print(Mod1(Model1.train,2))
-#print(Mod2(train,1))
-#print(Mod2(train,2))
+print(Mod1(Model1.train,1))
+print(Mod1(Model1.train,2))
+print(Mod2(train,1))
+print(Mod2(train,2))
 
-ROC(traind,2)
+#ROC(traind,2)

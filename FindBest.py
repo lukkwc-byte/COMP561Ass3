@@ -98,14 +98,12 @@ def FindMotif(b, nb):
     ml=Permute()
     bound=fileio.readFile(b)[0]
     unbound=fileio.readFile(nb)[0]
-    trials=len(bound)+len(unbound)
+    trials=len(bound)
     aD=allelefreqs(bound,unbound)
     boundDict=CreateSeqDict()
     boundDict=UpdateDict(boundDict, fileio.readFile(b))
     bestSeq=""
     bestP=1
-    count=0
-    print(aD)
     for s in ml:
         start=timeit.default_timer()
         conSeq="".join(s)
@@ -113,21 +111,11 @@ def FindMotif(b, nb):
         t=0
         for seq in possibleSeqs:
             t+=boundDict[seq]
-        if t == 5743:
             q=prob(conSeq, aD)
             p=binom.logpmf(t, trials, q, loc=trials*q)
             if p < bestP:
                 bestSeq=conSeq
                 bestP=p
-        if count==1000000:
-            print("""
-────██──────▀▀▀██
-──▄▀█▄▄▄─────▄▀█▄▄▄
-▄▀──█▄▄──────█─█▄▄
-─▄▄▄▀──▀▄───▄▄▄▀──▀▄
-─▀───────▀▀─▀───────▀▀""")
-            count=0
-        count+=1
     return bestSeq
 
 print(FindMotif("b0.fa", "n0.fa"))
